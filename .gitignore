@@ -1,0 +1,54 @@
+# kdiff3 ignore
+*.orig
+
+# maven ignore
+target/
+.mvn
+mvnw
+mvnw.cmd
+
+# eclipse ignore
+.settings/
+.project
+.classpath
+
+# idea ignore
+.idea/
+*.ipr
+*.iml
+*.iws
+#*.ver
+
+# temp ignore
+*.log
+*.cache
+*.diff
+*.patch
+*.tmp
+*.cache.lock
+ver/
+versions.mapping
+
+
+# system ignore
+.DS_Store
+Thumbs.db
+*.ver
+
+# package ignore (optional)
+# *.jar
+# *.war
+# *.zip
+# *.tar
+# *.tar.gz
+
+# JRebel
+rebel.xml
+*rebel.xml.bak
+
+# local config ignore
+local
+*-local.yml
+
+# local classes
+classes
