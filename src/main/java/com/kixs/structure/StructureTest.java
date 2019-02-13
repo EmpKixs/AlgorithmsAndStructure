@@ -22,8 +22,10 @@ public class StructureTest {
 
     private static void normalAVLTest() {
         NormalAVL<Integer> avl = new NormalAVL<>();
-        List<Integer> data = Lists.newArrayList(5,6,7,4,4,5,3,8,1,9,2,6,8,7,9,3,1);
-        data.forEach(avl::put);
+        /*List<Integer> data = Lists.newArrayList(5,6,7,4,4,5,3,8,1,9,2,6,8,7,9,3,1);*/
+        String dataFileName = RandomIntGenerator.getDataFileName(32);
+        Integer[] data = RandomIntGenerator.getRandomIntFromFile(dataFileName);
+        Stream.of(data).forEach(avl::put);
         System.out.println(avl.inorderTraversal().stream().map(String::valueOf).collect(Collectors.joining(",")));
     }
 

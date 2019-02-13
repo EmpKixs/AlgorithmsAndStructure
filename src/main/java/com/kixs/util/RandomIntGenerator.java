@@ -17,12 +17,13 @@ public class RandomIntGenerator {
 
     public static void main(String[] args) throws IOException {
         // 生成10、1k、1w、10w、100w个数
-        generatorRandomInt(10);
+        /*generatorRandomInt(10);
         generatorRandomInt(100);
         generatorRandomInt(1000);
         generatorRandomInt(10000);
         generatorRandomInt(100000);
-        generatorRandomInt(1000000);
+        generatorRandomInt(1000000);*/
+        generatorRandomInt(33);
     }
 
     public static void generatorRandomInt(int N) throws IOException {

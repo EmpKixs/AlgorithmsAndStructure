@@ -45,93 +45,89 @@ public class NormalAVL<T extends Comparable<T>> {
         balancedAVL(node);
     }
 
+    /**
+     * 检查节点平衡状态
+     *
+     * @param node 节点
+     * @return 平衡状态
+     */
+    private AVLBalancedType checkBalanced(Node<T> node) {
+        return AVLBalancedType.getBalancedType(calcHeight(node.left) - calcHeight(node.right));
+    }
+
+    /**
+     * 平衡操作
+     *
+     * @param parent 新加入节点的父节点
+     */
     private void balancedAVL(Node<T> parent) {
         if (parent == null || parent.parent == null) {
             // 空树或只有两级
             return;
         }
-        Node<T> balancedNode = parent.parent;
-        if (parent.parent.parent != null) {
-            balancedNode = parent.parent.parent;
-        }
-        int lHeight = calcHeight(balancedNode.left);
-        int rHeight = calcHeight(balancedNode.right);
-        if (Math.abs(lHeight - rHeight) > 1) {
-            // 不平衡，需要重新平衡
-            if (lHeight > rHeight) {
-                // 左高
-                fixRightRotation(balancedNode);
+        AVLBalancedType balancedType = checkBalanced(parent.parent);
+        if (!balancedType.isBalanced()) {
+            if (AVLBalancedType.HIGH_LEFT.equals(balancedType)) {
+                simpleRightRotation(parent);
             } else {
-                // 右高
-                fixLeftRotation(balancedNode);
+                simpleLeftRotation(parent);
             }
-        }
-    }
-
-    private void fixLeftRotation(Node<T> balancedNode) {
-        final Node<T> rightNode = balancedNode.right;
-        if (rightNode.right != null) {
-            simpleLeftRotation(balancedNode);
-        } else if (rightNode.left != null) {
-            simpleRightRotation(balancedNode);
-            balancedNode.right = leftRotation(rightNode);
-        }
-    }
-
-    private void fixRightRotation(Node<T> balancedNode) {
-        final Node<T> leftNode = balancedNode.left;
-        if (leftNode.left != null) {
-            simpleRightRotation(balancedNode);
-        } else if (leftNode.right != null) {
-            balancedNode.left = leftRotation(leftNode);
-            simpleRightRotation(balancedNode);
+        } else {
+            if (parent.parent.parent != null) {
+                balancedType = checkBalanced(parent.parent.parent);
+                if (!balancedType.isBalanced()) {
+                    if (AVLBalancedType.HIGH_LEFT.equals(balancedType)) {
+                        fixRightRotation(parent);
+                    } else {
+                        fixLeftRotation(parent);
+                    }
+                }
+            }
         }
     }
 
     private void simpleLeftRotation(Node<T> balancedNode) {
-        // 0:balancedNode为根节点;1:balancedNode为右子节点;-1:balancedNode为左子节点
-        int childTag = getChildTag(balancedNode);
-        if (childTag == 0) {
-            root = leftRotation(balancedNode);
-        } else if (childTag < 0) {
-            balancedNode.parent.left = leftRotation(balancedNode);
+        if (balancedNode.left == null) {
+            leftRotation(balancedNode);
         } else {
-            balancedNode.parent.right = leftRotation(balancedNode);
+            Node<T> childRoot = rightRotation(balancedNode);
+            leftRotation(childRoot);
         }
     }
 
     private void simpleRightRotation(Node<T> balancedNode) {
-        // 0:balancedNode为根节点;1:balancedNode为右子节点;-1:balancedNode为左子节点
-        int childTag = getChildTag(balancedNode);
-        if (childTag == 0) {
-            root = rightRotation(balancedNode);
-        } else if (childTag < 0) {
-            balancedNode.parent.left = rightRotation(balancedNode);
+        if (balancedNode.right == null) {
+            rightRotation(balancedNode);
         } else {
-            balancedNode.parent.right = rightRotation(balancedNode);
+            Node<T> childRoot = leftRotation(balancedNode);
+            rightRotation(childRoot);
+        }
+    }
+
+    private void fixLeftRotation(Node<T> balancedNode) {
+        if (balancedNode.equals(balancedNode.parent.right)) {
+            leftRotation(balancedNode.parent);
+        } else {
+            Node<T> childRoot = rightRotation(balancedNode);
+            leftRotation(childRoot.parent);
+        }
+    }
+
+    private void fixRightRotation(Node<T> balancedNode) {
+        if (balancedNode.equals(balancedNode.parent.left)) {
+            rightRotation(balancedNode.parent);
+        } else {
+            Node<T> childRoot = leftRotation(balancedNode);
+            rightRotation(childRoot.parent);
         }
     }
 
     /**
-     * 判断balancedNode是父节点的左子节点还是右子节点
+     * 计算节点高度
      *
-     * @param balancedNode 待平衡节点
-     * @return 0:balancedNode为根节点;1:balancedNode为右子节点;-1:balancedNode为左子节点
+     * @param node 节点
+     * @return 节点高度
      */
-    private int getChildTag(Node<T> balancedNode) {
-        int childTag = 0;
-        final Node<T> parentBalancedNode = balancedNode.parent;
-        if (parentBalancedNode != null) {
-            if (balancedNode.equals(parentBalancedNode.left)) {
-                childTag = -1;
-            } else {
-                childTag = 1;
-            }
-        }
-        return childTag;
-    }
-
-
     private int calcHeight(Node node) {
         if (node == null) {
             return 0;
@@ -164,44 +160,80 @@ public class NormalAVL<T extends Comparable<T>> {
     /**
      * 子树左旋
      *
-     * @param tree 子树
+     * @param x 子树
      * @return 旋转后子树根节点
      */
-    private Node<T> leftRotation(Node<T> tree) {
-        if (tree == null) {
+    private Node<T> leftRotation(Node<T> x) {
+        if (x == null) {
             return null;
         }
-        Node<T> rightTree = tree.right;
-        if (rightTree == null) {
-            return tree;
+        // 1、确定旋转节点[X]的父节点[P]
+        Node<T> p = x.parent;
+        // 左旋判断x是p的左子节点还是右子节点
+        if (x.equals(p.right)) {
+            // 2、修改X的父节点为P的父节点
+            x.parent = p.parent;
+            // 3、修改X.left指向P
+            p.right = x.left;
+            if (x.left != null) {
+                x.left.parent = p;
+            }
+            // 4、修改P指向X
+            x.right = p;
+            p.parent = x;
+            if (x.parent == null) {
+                root = x;
+            }
+            return x;
+        } else {
+            p.left = x.right;
+            x.right.parent = p;
+            // 优化
+            x.left = p.right.right;
+            p.right.right = x;
+            x.parent = p.right.right;
+            return p.right;
         }
 
-        tree.right = rightTree.left;
-        rightTree.left = tree;
-        rightTree.parent = tree.parent;
-        tree.parent = rightTree;
-        return rightTree;
     }
 
     /**
      * 子树右旋
      *
-     * @param tree 子树
+     * @param x 子树
      * @return 旋转后子树根节点
      */
-    private Node<T> rightRotation(Node<T> tree) {
-        if (tree == null) {
+    private Node<T> rightRotation(Node<T> x) {
+        if (x == null) {
             return null;
         }
-        Node<T> leftTree = tree.left;
-        if (leftTree == null) {
-            return tree;
+        // 1、确定旋转节点[X]的父节点[P]
+        Node<T> p = x.parent;
+        // 右旋判断x是p的左子节点还是右子节点
+        if (x.equals(p.left)) {
+            // 2、修改X的父节点为P的父节点
+            x.parent = p.parent;
+            // 3、修改X.right指向P
+            p.left = x.right;
+            if (x.right != null) {
+                x.right.parent = p;
+            }
+            // 4、修改P指向X
+            x.right = p;
+            p.parent = x;
+            if (x.parent == null) {
+                root = x;
+            }
+            return x;
+        } else {
+            p.right = x.left;
+            x.left.parent = p;
+            // 优化
+            x.left = p.right.right;
+            p.right.right = x;
+            x.parent = p.right.right;
+            return p.right;
         }
-        tree.left = leftTree.right;
-        leftTree.right = tree;
-        leftTree.parent = tree.parent;
-        tree.parent = leftTree;
-        return leftTree;
     }
 
     /**
