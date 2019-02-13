@@ -19,7 +19,7 @@ public class NormalAVL<T extends Comparable<T>> {
 
     public void put(T value) {
         if (root == null) {
-            root = new Node<>(null, value);
+            root = new Node<>(value);
         }
         put(root, value);
     }
@@ -90,7 +90,7 @@ public class NormalAVL<T extends Comparable<T>> {
         if (balancedNode.left == null) {
             leftRotation(balancedNode);
         } else {
-            Node<T> childRoot = rightRotation(balancedNode);
+            Node<T> childRoot = rebuildRL(balancedNode);
             leftRotation(childRoot);
         }
     }
@@ -99,7 +99,7 @@ public class NormalAVL<T extends Comparable<T>> {
         if (balancedNode.right == null) {
             rightRotation(balancedNode);
         } else {
-            Node<T> childRoot = leftRotation(balancedNode);
+            Node<T> childRoot = rebuildLR(balancedNode);
             rightRotation(childRoot);
         }
     }
@@ -109,7 +109,7 @@ public class NormalAVL<T extends Comparable<T>> {
             leftRotation(balancedNode.parent);
         } else {
             Node<T> childRoot = rightRotation(balancedNode);
-            leftRotation(childRoot.parent);
+            leftRotation(childRoot);
         }
     }
 
@@ -118,7 +118,7 @@ public class NormalAVL<T extends Comparable<T>> {
             rightRotation(balancedNode.parent);
         } else {
             Node<T> childRoot = leftRotation(balancedNode);
-            rightRotation(childRoot.parent);
+            rightRotation(childRoot);
         }
     }
 
@@ -157,6 +157,46 @@ public class NormalAVL<T extends Comparable<T>> {
         return data;
     }
 
+    private Node<T> rebuildRL(Node<T> x) {
+        if (x == null) {
+            return null;
+        }
+        Node<T> p = x.parent;
+        Node<T> left = x.left;
+
+        left.parent = null;
+        x.left = null;
+        x.parent = null;
+        p.right = null;
+
+        p.right = left;
+        left.parent = p;
+        x.parent = left;
+        left.right = x;
+
+        return left;
+    }
+
+    private Node<T> rebuildLR(Node<T> x) {
+        if (x == null) {
+            return null;
+        }
+        Node<T> p = x.parent;
+        Node<T> right = x.right;
+
+        x.right = null;
+        right.parent = null;
+        p.left = null;
+        x.parent = null;
+
+        p.left = right;
+        right.parent = p;
+        x.parent = right;
+        right.left = x;
+
+        return right;
+    }
+
     /**
      * 子树左旋
      *
@@ -167,34 +207,43 @@ public class NormalAVL<T extends Comparable<T>> {
         if (x == null) {
             return null;
         }
-        // 1、确定旋转节点[X]的父节点[P]
+        // 1、定位父节点P和左子节点left，P = X.parent，left = X.left；定位P的父节点PP，PP = P.parent；
         Node<T> p = x.parent;
-        // 左旋判断x是p的左子节点还是右子节点
-        if (x.equals(p.right)) {
-            // 2、修改X的父节点为P的父节点
-            x.parent = p.parent;
-            // 3、修改X.left指向P
-            p.right = x.left;
-            if (x.left != null) {
-                x.left.parent = p;
+        // x不能为根节点且x为P的右子节点
+        if (p != null && x.equals(p.right)) {
+            Node<T> left = x.left;
+            Node<T> pp = p.parent;
+            // 2、解除X与P和left的关系，X.parent = null，P.right = null，left.parent = null, X.left = null；
+            // 解除P与PP的关系，P.parent = null;
+            x.parent = null;
+            p.right = null;
+            if (left != null) {
+                left.parent = null;
             }
-            // 4、修改P指向X
-            x.right = p;
+            x.left = null;
+            // 3、建立P与left根右关系，P.right = left，left.parent = P;
+            p.right = left;
+            if (left != null) {
+                left.parent = p;
+            }
+            // 4、建立X与P的根左关系，X.left = P，P.parent = X;
+            x.left = p;
             p.parent = x;
-            if (x.parent == null) {
+            // 5、建立X与PP的关系，X.parent = PP；
+            // 根据P与PP的关系建立PP与X的关系：
+            // 5.1、P为根节点，即PP == null，则更新根节点为X；
+            // 5.2、P为PP的左子节点，即P == PP.left，则PP.left = X；
+            // 5.3、P为PP的右子节点，即P == PP.right，则PP.right = X；
+            x.parent = pp;
+            if (pp == null) {
                 root = x;
+            } else if (p.equals(pp.left)) {
+                pp.left = x;
+            } else {
+                pp.right = x;
             }
-            return x;
-        } else {
-            p.left = x.right;
-            x.right.parent = p;
-            // 优化
-            x.left = p.right.right;
-            p.right.right = x;
-            x.parent = p.right.right;
-            return p.right;
         }
-
+        return x;
     }
 
     /**
@@ -207,33 +256,43 @@ public class NormalAVL<T extends Comparable<T>> {
         if (x == null) {
             return null;
         }
-        // 1、确定旋转节点[X]的父节点[P]
+        // 1、定位父节点P和左子节点right，P = X.parent，right = X.right；定位P的父节点PP，PP = P.parent；
         Node<T> p = x.parent;
-        // 右旋判断x是p的左子节点还是右子节点
-        if (x.equals(p.left)) {
-            // 2、修改X的父节点为P的父节点
-            x.parent = p.parent;
-            // 3、修改X.right指向P
-            p.left = x.right;
-            if (x.right != null) {
-                x.right.parent = p;
+        // x不能为根节点且x为P的左子节点
+        if (p != null && x.equals(p.left)) {
+            Node<T> right = x.right;
+            Node<T> pp = p.parent;
+            // 2、解除X与P和right的关系，X.parent = null，P.left = null，right.parent = null, X.right = null；
+            // 解除P与PP的关系，P.parent = null;
+            x.parent = null;
+            p.left = null;
+            if (right != null) {
+                right.parent = null;
             }
-            // 4、修改P指向X
+            x.right = null;
+            // 3、建立P与right根左关系，P.left = right，right.parent = P;
+            p.left = right;
+            if (right != null) {
+                right.parent = p;
+            }
+            // 4、建立X与P的根右关系，X.right = P，P.parent = X;
             x.right = p;
             p.parent = x;
-            if (x.parent == null) {
+            // 5、建立X与PP的关系，X.parent = PP；
+            // 根据P与PP的关系建立PP与X的关系：
+            // 5.1、P为根节点，即PP == null，则更新根节点为X；
+            // 5.2、P为PP的左子节点，即P == PP.left，则PP.left = X；
+            // 5.3、P为PP的右子节点，即P == PP.right，则PP.right = X；
+            x.parent = pp;
+            if (pp == null) {
                 root = x;
+            } else if (p.equals(pp.left)) {
+                pp.left = x;
+            } else {
+                pp.right = x;
             }
-            return x;
-        } else {
-            p.right = x.left;
-            x.left.parent = p;
-            // 优化
-            x.left = p.right.right;
-            p.right.right = x;
-            x.parent = p.right.right;
-            return p.right;
         }
+        return x;
     }
 
     /**
