@@ -19,12 +19,20 @@ public class StructureTest {
 
     private static void normalAVLTest() {
         NormalAvl<Integer> avl = new NormalAvl<>();
-        /*List<Integer> data = Lists.newArrayList(5,6,7,4,4,5,3,8,1,9,2,6,8,7,9,3,1);*/
         String dataFileName = RandomIntGenerator.getDataFileName(50);
         Integer[] data = RandomIntGenerator.getRandomIntFromFile(dataFileName);
         Stream.of(data).forEach(avl::put);
+        removeLeafTest(avl);
+        boolean isBalanced = avl.isBalanced();
+        System.out.println(isBalanced ? "AVL is balanced!" : "AVL is not balanced!");
         System.out.println(avl.inorderTraversal().stream().map(String::valueOf).collect(Collectors.joining(",")));
         System.out.println(avl.preOrderTraversal().stream().map(String::valueOf).collect(Collectors.joining(",")));
+    }
+    private static void removeLeafTest(NormalAvl<Integer> avl) {
+        // avl.remove(0);
+        // avl.remove(3);
+        // avl.remove(6);
+        avl.remove(11);
     }
 
     private static void binarySearchTreeTest() {

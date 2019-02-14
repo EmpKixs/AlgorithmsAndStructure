@@ -17,9 +17,292 @@ public class NormalAvl<T extends Comparable<T>> {
      */
     private Node<T> root;
 
+    /**
+     * 节点数
+     */
+    private int size = 0;
+
+    /**
+     * 获取二叉平衡树大小（节点数）
+     *
+     * @return 节点数
+     */
+    public int size() {
+        return size;
+    }
+
+    public T max() {
+        if (root == null) {
+            return null;
+        }
+        return max(root).value;
+    }
+
+    public Node<T> max(Node<T> node) {
+        if (node == null) {
+            return null;
+        }
+        if (node.right == null) {
+            return node;
+        }
+        return max(node.right);
+    }
+
+    /**
+     * 删除指定节点
+     *
+     * @param value 节点value
+     * @return 删除成功返回对应value；删除失败返回null（无对应value）
+     */
+    public T remove(T value) {
+        if (value == null) {
+            return null;
+        }
+        Node<T> removeNode = find(value);
+        if (removeNode == null) {
+            return null;
+        }
+        return remove(removeNode).value;
+    }
+
+    /**
+     * 删除指定节点
+     *
+     * @param removeNode 指定节点
+     * @return 指定节点
+     */
+    private Node<T> remove(Node<T> removeNode) {
+        if (removeNode.isLeaf()) {
+            removeLeafNode(removeNode);
+        } else {
+            removeTreeNode(removeNode);
+        }
+        size--;
+        return removeNode;
+    }
+
+    /**
+     * 删除 有子节点
+     *
+     * @param treeNode 有子节点
+     */
+    private void removeTreeNode(Node<T> treeNode) {
+        if (treeNode.isSingleLeaf()) {
+            removeSingleLeafTreeNode(treeNode);
+        } else {
+            removeDoubleChildTreeNode(treeNode);
+        }
+    }
+
+    /**
+     * 删除双子节点
+     *
+     * @param treeNode 双子节点
+     */
+    private void removeDoubleChildTreeNode(Node<T> treeNode) {
+        if (!treeNode.hasDoubleChild()) {
+            throw new UnsupportedOperationException("节点：" + treeNode.value + "非双子树节点");
+        }
+        // 采用treeNode的左子树的最右侧节点代替当前节点
+        // 定位特征节点
+        Node<T> leftMax = max(treeNode.left);
+        Node<T> left = treeNode.left;
+        Node<T> right = treeNode.right;
+        Node<T> p = treeNode.parent;
+        Node<T> leftMaxP = leftMax.parent;
+        // 清除treeNode及特征节点的上下关联
+        treeNode.left = null;
+        treeNode.right = null;
+        right.parent = null;
+        left.parent = null;
+        leftMax.parent = null;
+        leftMaxP.right = null;
+        // 连接父节点
+        leftMax.parent = p;
+        if (p != null) {
+            boolean isLeft = treeNode.equals(p.left);
+            if (isLeft) {
+                p.left = leftMax;
+            } else {
+                p.right = leftMax;
+            }
+        }
+        // 连接右子树
+        leftMax.right = right;
+        right.parent = leftMax;
+        // 连接左子树
+        if (!left.equals(leftMax)) {
+            leftMax.left = left;
+            left.parent = leftMax;
+        }
+        Node<T> balancedNode;
+        if (leftMaxP.equals(treeNode)) {
+            balancedNode = leftMax;
+        } else {
+            AVLBalancedType balancedType = checkBalanced(leftMaxP);
+            if (balancedType.isBalanced()) {
+                balancedNode = leftMaxP;
+            } else {
+                balancedNode = leftMaxP.left;
+            }
+        }
+        while (balancedNode != null) {
+            balancedNode = balancedAVL(balancedNode);
+            balancedNode = balancedNode.parent;
+        }
+    }
+
+    /**
+     * 删除单叶节点
+     *
+     * @param treeNode 单叶节点
+     */
+    private void removeSingleLeafTreeNode(Node<T> treeNode) {
+        if (!treeNode.isSingleLeaf()) {
+            throw new UnsupportedOperationException("节点：" + treeNode.value + "非单叶树节点");
+        }
+        Node<T> p = treeNode.parent;
+        Node<T> leaf = treeNode.left == null ? treeNode.right : treeNode.left;
+
+        leaf.parent = null;
+        treeNode.parent = null;
+        leaf.parent = p;
+        if (p == null) {
+            // 删除单叶根节点
+            root = leaf;
+            return;
+        }
+        boolean isLeft = treeNode.equals(p.left);
+        if (isLeft) {
+            p.left = leaf;
+        } else {
+            p.right = leaf;
+        }
+
+        Node<T> balancedNode;
+        AVLBalancedType balancedType = checkBalanced(p);
+        if (balancedType.isBalanced()) {
+            balancedNode = p;
+        } else {
+            if (isLeft) {
+                balancedType = checkBalanced(p.right);
+                if (AVLBalancedType.NORMAL_LEFT.equals(balancedType)) {
+                    balancedNode = p.right.left;
+                } else {
+                    balancedNode = p.right;
+                }
+            } else {
+                balancedType = checkBalanced(p.left);
+                if (AVLBalancedType.NORMAL_RIGHT.equals(balancedType)) {
+                    balancedNode = p.left.right;
+                } else {
+                    balancedNode = p.left;
+                }
+            }
+        }
+        while (balancedNode != null) {
+            balancedNode = balancedAVL(balancedNode);
+            balancedNode = balancedNode.parent;
+        }
+    }
+
+    /**
+     * 删除指定的叶子节点
+     *
+     * @param leafNode 被删除的叶子检点
+     * @return 被删除的叶子检点
+     */
+    private void removeLeafNode(Node<T> leafNode) {
+        if (!leafNode.isLeaf()) {
+            throw new UnsupportedOperationException("节点：" + leafNode.value + "非叶子节点");
+        }
+        Node<T> p = leafNode.parent;
+        leafNode.parent = null;
+        if (p != null) {
+            if (leafNode.equals(p.left)) {
+                p.left = null;
+            } else {
+                p.right = null;
+            }
+            Node<T> balancedNode = p;
+            AVLBalancedType balancedType = checkBalanced(p);
+            if (balancedType.isBalanced()) {
+                if (p.parent != null) {
+                    balancedType = checkBalanced(p.parent);
+                    if (balancedType.isBalanced()) {
+                        balancedNode = p.parent;
+                    } else {
+                        if (AVLBalancedType.HIGH_LEFT.equals(balancedType)) {
+                            balancedNode = p.parent.left;
+                            if (AVLBalancedType.NORMAL_RIGHT.equals(checkBalanced(p.parent.left))) {
+                                balancedNode = p.parent.left.right;
+                            }
+                        } else {
+                            balancedNode = p.parent.right;
+                            if (AVLBalancedType.NORMAL_LEFT.equals(checkBalanced(p.parent.right))) {
+                                balancedNode = p.parent.right.left;
+                            }
+                        }
+                    }
+                }
+            } else {
+                if (AVLBalancedType.HIGH_LEFT.equals(balancedType)) {
+                    balancedNode = p.left;
+                } else {
+                    balancedNode = p.right;
+                }
+            }
+            /*int height = calcHeight(p);
+            if (height == 0) {
+                balancedNode = p.parent;
+            } else if (height == 1) {
+                balancedNode = p;
+            } else {
+                balancedNode = p.left == null ? p.right : p.left;
+            }*/
+            while (balancedNode != null) {
+                balancedNode = balancedAVL(balancedNode);
+                balancedNode = balancedNode.parent;
+            }
+        } else {
+            root = null;
+        }
+    }
+
+    private Node<T> find(T value) {
+        if (root == null) {
+            return null;
+        }
+        return find(root, value);
+    }
+
+    private Node<T> find(Node<T> node, T value) {
+        if (node == null) {
+            return null;
+        }
+        int cmp = value.compareTo(node.value);
+        if (cmp > 0) {
+            return find(node.right, value);
+        } else if (cmp < 0) {
+            return find(node.left, value);
+        } else {
+            return node;
+        }
+    }
+
+    /**
+     * 插入新值
+     *
+     * @param value 值
+     */
     public void put(T value) {
+        if (value == null) {
+            return;
+        }
         if (root == null) {
             root = new Node<>(value);
+            size = 1;
+            return;
         }
         put(root, value);
     }
@@ -31,18 +314,49 @@ public class NormalAvl<T extends Comparable<T>> {
                 put(node.right, value);
             } else {
                 node.right = new Node<>(node, value);
+                size++;
             }
         } else if (compare < 0) {
             if (node.left != null) {
                 put(node.left, value);
             } else {
                 node.left = new Node<>(node, value);
+                size++;
             }
         } else {
             // compare == 0 表示已存在，更新value
             node.value = value;
         }
         balancedAVL(node);
+    }
+
+    /**
+     * 校验AVL是否平衡
+     *
+     * @return true：平衡；false：不平衡
+     */
+    public boolean isBalanced() {
+        if (root == null) {
+            return true;
+        }
+        return isBalanced(root);
+    }
+
+    private boolean isBalanced(Node<T> node) {
+        if (node.isLeaf()) {
+            return true;
+        }
+        AVLBalancedType balancedType = checkBalanced(node);
+        if (!balancedType.isBalanced()) {
+            return false;
+        }
+        if (node.left != null && !node.left.isLeaf() && !isBalanced(node.left)) {
+            return false;
+        }
+        if (node.right != null && !node.right.isLeaf() && !isBalanced(node.right)) {
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -59,66 +373,78 @@ public class NormalAvl<T extends Comparable<T>> {
      * 平衡操作
      *
      * @param parent 新加入节点的父节点
+     * @return 平衡后的子树根节点
      */
-    private void balancedAVL(Node<T> parent) {
+    private Node<T> balancedAVL(Node<T> parent) {
+        Node<T> balancedNode = parent;
         if (parent == null || parent.parent == null) {
             // 空树或只有两级
-            return;
+            return balancedNode;
         }
-        AVLBalancedType balancedType = checkBalanced(parent.parent);
+        // 保证节点自身平衡
+        AVLBalancedType balancedType = checkBalanced(balancedNode);
         if (!balancedType.isBalanced()) {
             if (AVLBalancedType.HIGH_LEFT.equals(balancedType)) {
-                simpleRightRotation(parent);
+                balancedNode = balancedAVL(balancedNode.left);
             } else {
-                simpleLeftRotation(parent);
+                balancedNode = balancedAVL(balancedNode.right);
+            }
+        }
+        balancedType = checkBalanced(balancedNode.parent);
+        if (!balancedType.isBalanced()) {
+            if (AVLBalancedType.HIGH_LEFT.equals(balancedType)) {
+                balancedNode = simpleRightRotation(parent);
+            } else {
+                balancedNode = simpleLeftRotation(parent);
             }
         } else {
             if (parent.parent.parent != null) {
                 balancedType = checkBalanced(parent.parent.parent);
                 if (!balancedType.isBalanced()) {
                     if (AVLBalancedType.HIGH_LEFT.equals(balancedType)) {
-                        fixRightRotation(parent);
+                        balancedNode = fixRightRotation(parent);
                     } else {
-                        fixLeftRotation(parent);
+                        balancedNode = fixLeftRotation(parent);
                     }
                 }
             }
         }
+        return balancedNode;
     }
 
-    private void simpleLeftRotation(Node<T> balancedNode) {
+    private Node<T> simpleLeftRotation(Node<T> balancedNode) {
         if (balancedNode.left == null) {
-            leftRotation(balancedNode);
+            return leftRotation(balancedNode);
         } else {
             Node<T> childRoot = rebuildRL(balancedNode);
-            leftRotation(childRoot);
+            return leftRotation(childRoot);
         }
     }
 
-    private void simpleRightRotation(Node<T> balancedNode) {
+    private Node<T> simpleRightRotation(Node<T> balancedNode) {
         if (balancedNode.right == null) {
-            rightRotation(balancedNode);
+            return rightRotation(balancedNode);
         } else {
             Node<T> childRoot = rebuildLR(balancedNode);
-            rightRotation(childRoot);
+            return rightRotation(childRoot);
         }
     }
 
-    private void fixLeftRotation(Node<T> balancedNode) {
+    private Node<T> fixLeftRotation(Node<T> balancedNode) {
         if (balancedNode.equals(balancedNode.parent.right)) {
-            leftRotation(balancedNode.parent);
+            return leftRotation(balancedNode.parent);
         } else {
             Node<T> childRoot = rightRotation(balancedNode);
-            leftRotation(childRoot);
+            return leftRotation(childRoot);
         }
     }
 
-    private void fixRightRotation(Node<T> balancedNode) {
+    private Node<T> fixRightRotation(Node<T> balancedNode) {
         if (balancedNode.equals(balancedNode.parent.left)) {
-            rightRotation(balancedNode.parent);
+            return rightRotation(balancedNode.parent);
         } else {
             Node<T> childRoot = leftRotation(balancedNode);
-            rightRotation(childRoot);
+            return rightRotation(childRoot);
         }
     }
 
@@ -179,6 +505,16 @@ public class NormalAvl<T extends Comparable<T>> {
         return data;
     }
 
+    /**
+     * 结构重塑
+     * <p>
+     * 重塑前：先序（5,6,7），中序（5,7,6），后序（6,7,5）
+     * 重塑后：先序（5,6,7），中序（5,6,7），后序（7,6,5）
+     * </p>
+     *
+     * @param x 重塑节点
+     * @return 重塑后节点
+     */
     private Node<T> rebuildRL(Node<T> x) {
         if (x == null) {
             return null;
@@ -199,6 +535,16 @@ public class NormalAvl<T extends Comparable<T>> {
         return left;
     }
 
+    /**
+     * 结构重塑
+     * <p>
+     * 重塑前：先序（7,5,6），中序（5,6,7），后序（6,5,7）
+     * 重塑后：先序（7,6,5），中序（5,6,7），后序（5,6,7）
+     * </p>
+     *
+     * @param x 重塑节点
+     * @return 重塑后节点
+     */
     private Node<T> rebuildLR(Node<T> x) {
         if (x == null) {
             return null;
@@ -345,6 +691,33 @@ public class NormalAvl<T extends Comparable<T>> {
             this.left = left;
             this.right = right;
             this.value = value;
+        }
+
+        /**
+         * 判断是否为叶子节点
+         */
+        public boolean isLeaf() {
+            return left == null && right == null;
+        }
+
+        /**
+         * 判断节点是否为单叶节点
+         */
+        public boolean isSingleLeaf() {
+            if (isLeaf()) {
+                return false;
+            }
+            if (left != null && right != null) {
+                return false;
+            }
+            return true;
+        }
+
+        /**
+         * 判断节点是否为双子节点
+         */
+        public boolean hasDoubleChild() {
+            return left != null && right != null;
         }
 
         public Node<T> getParent() {
