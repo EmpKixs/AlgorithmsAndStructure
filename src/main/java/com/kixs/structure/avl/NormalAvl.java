@@ -126,6 +126,13 @@ public class NormalAvl<T extends Comparable<T>> {
             } else {
                 p.right = leftMax;
             }
+        } else {
+            // p == null表示删除根节点
+            root = leftMax;
+        }
+        if (leftMax.left != null) {
+            leftMaxP.right = leftMax.left;
+            leftMax.left = leftMaxP;
         }
         // 连接右子树
         leftMax.right = right;
@@ -144,10 +151,13 @@ public class NormalAvl<T extends Comparable<T>> {
                 balancedNode = leftMaxP;
             } else {
                 balancedNode = leftMaxP.left;
+                if (AVLBalancedType.NORMAL_RIGHT.equals(checkBalanced(leftMaxP.left))) {
+                    balancedNode = leftMaxP.left.right;
+                }
             }
         }
         while (balancedNode != null) {
-            balancedNode = balancedAVL(balancedNode);
+            balancedNode = removingBalancedAVL(balancedNode);
             balancedNode = balancedNode.parent;
         }
     }
@@ -201,7 +211,7 @@ public class NormalAvl<T extends Comparable<T>> {
             }
         }
         while (balancedNode != null) {
-            balancedNode = balancedAVL(balancedNode);
+            balancedNode = removingBalancedAVL(balancedNode);
             balancedNode = balancedNode.parent;
         }
     }
@@ -252,16 +262,8 @@ public class NormalAvl<T extends Comparable<T>> {
                     balancedNode = p.right;
                 }
             }
-            /*int height = calcHeight(p);
-            if (height == 0) {
-                balancedNode = p.parent;
-            } else if (height == 1) {
-                balancedNode = p;
-            } else {
-                balancedNode = p.left == null ? p.right : p.left;
-            }*/
             while (balancedNode != null) {
-                balancedNode = balancedAVL(balancedNode);
+                balancedNode = removingBalancedAVL(balancedNode);
                 balancedNode = balancedNode.parent;
             }
         } else {
@@ -370,12 +372,13 @@ public class NormalAvl<T extends Comparable<T>> {
     }
 
     /**
-     * 平衡操作
+     * 平衡操作（删除平衡）
      *
-     * @param parent 新加入节点的父节点
+     * @param parent 待平衡节点
      * @return 平衡后的子树根节点
      */
-    private Node<T> balancedAVL(Node<T> parent) {
+    @SuppressWarnings("all")
+    private Node<T> removingBalancedAVL(Node<T> parent) {
         Node<T> balancedNode = parent;
         if (parent == null || parent.parent == null) {
             // 空树或只有两级
@@ -385,12 +388,55 @@ public class NormalAvl<T extends Comparable<T>> {
         AVLBalancedType balancedType = checkBalanced(balancedNode);
         if (!balancedType.isBalanced()) {
             if (AVLBalancedType.HIGH_LEFT.equals(balancedType)) {
-                balancedNode = balancedAVL(balancedNode.left);
+                balancedNode = removingBalancedAVL(balancedNode.left);
             } else {
-                balancedNode = balancedAVL(balancedNode.right);
+                balancedNode = removingBalancedAVL(balancedNode.right);
             }
         }
         balancedType = checkBalanced(balancedNode.parent);
+        if (!balancedType.isBalanced()) {
+            if (AVLBalancedType.HIGH_LEFT.equals(balancedType)) {
+                if (balancedNode.parent.right == null) {
+                    balancedNode = simpleRightRotation(balancedNode);
+                } else {
+                    balancedNode = rightRotation(balancedNode);
+                }
+            } else {
+                if (balancedNode.parent.left == null) {
+                    balancedNode = simpleLeftRotation(balancedNode);
+                } else {
+                    balancedNode = leftRotation(balancedNode);
+                }
+            }
+        } else {
+            if (balancedNode.parent.parent != null) {
+                balancedType = checkBalanced(balancedNode.parent.parent);
+                if (!balancedType.isBalanced()) {
+                    if (AVLBalancedType.HIGH_LEFT.equals(balancedType)) {
+                        balancedNode = fixRightRotation(balancedNode);
+                    } else {
+                        balancedNode = fixLeftRotation(balancedNode);
+                    }
+                }
+            }
+        }
+        return balancedNode;
+    }
+
+    /**
+     * 平衡操作（新增平衡）
+     *
+     * @param parent 新加入节点的父节点
+     * @return 平衡后的子树根节点
+     */
+    @SuppressWarnings("all")
+    private Node<T> balancedAVL(Node<T> parent) {
+        Node<T> balancedNode = parent;
+        if (parent == null || parent.parent == null) {
+            // 空树或只有两级
+            return balancedNode;
+        }
+        AVLBalancedType balancedType = checkBalanced(balancedNode.parent);
         if (!balancedType.isBalanced()) {
             if (AVLBalancedType.HIGH_LEFT.equals(balancedType)) {
                 balancedNode = simpleRightRotation(parent);
