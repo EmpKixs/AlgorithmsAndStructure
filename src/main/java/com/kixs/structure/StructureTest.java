@@ -1,11 +1,8 @@
 package com.kixs.structure;
 
-import com.google.common.collect.Lists;
-import com.kixs.structure.avl.NormalAVL;
+import com.kixs.structure.avl.NormalAvl;
 import com.kixs.util.RandomIntGenerator;
 
-import java.util.List;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -21,12 +18,13 @@ public class StructureTest {
     }
 
     private static void normalAVLTest() {
-        NormalAVL<Integer> avl = new NormalAVL<>();
+        NormalAvl<Integer> avl = new NormalAvl<>();
         /*List<Integer> data = Lists.newArrayList(5,6,7,4,4,5,3,8,1,9,2,6,8,7,9,3,1);*/
-        String dataFileName = RandomIntGenerator.getDataFileName(32);
+        String dataFileName = RandomIntGenerator.getDataFileName(50);
         Integer[] data = RandomIntGenerator.getRandomIntFromFile(dataFileName);
         Stream.of(data).forEach(avl::put);
         System.out.println(avl.inorderTraversal().stream().map(String::valueOf).collect(Collectors.joining(",")));
+        System.out.println(avl.preOrderTraversal().stream().map(String::valueOf).collect(Collectors.joining(",")));
     }
 
     private static void binarySearchTreeTest() {

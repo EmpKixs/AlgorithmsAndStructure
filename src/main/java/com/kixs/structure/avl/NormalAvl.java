@@ -10,7 +10,7 @@ import java.util.List;
  * @author wangbing
  * @version 1.0, 2018/11/9
  */
-public class NormalAVL<T extends Comparable<T>> {
+public class NormalAvl<T extends Comparable<T>> {
 
     /**
      * 根节点
@@ -152,6 +152,28 @@ public class NormalAVL<T extends Comparable<T>> {
             data.add(node.value);
             if (node.right != null) {
                 inorderTraversal(node.right, data);
+            }
+        }
+        return data;
+    }
+
+    /**
+     * 先序遍历节点
+     *
+     * @return 数据
+     */
+    public List<T> preOrderTraversal() {
+        return preOrderTraversal(root, new ArrayList<>());
+    }
+
+    private List<T> preOrderTraversal(Node<T> node, List<T> data) {
+        if (node != null) {
+            data.add(node.value);
+            if (node.left != null) {
+                preOrderTraversal(node.left, data);
+            }
+            if (node.right != null) {
+                preOrderTraversal(node.right, data);
             }
         }
         return data;
