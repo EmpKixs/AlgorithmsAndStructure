@@ -31,6 +31,9 @@ public class NormalAvl<T extends Comparable<T>> {
         return size;
     }
 
+    /**
+     * 获取最大值
+     */
     public T max() {
         if (root == null) {
             return null;
@@ -38,7 +41,13 @@ public class NormalAvl<T extends Comparable<T>> {
         return max(root).value;
     }
 
-    public Node<T> max(Node<T> node) {
+    /**
+     * 获取以指定节点为根的最大值节点
+     *
+     * @param node 指定节点
+     * @return 最大值节点
+     */
+    private Node<T> max(Node<T> node) {
         if (node == null) {
             return null;
         }
@@ -220,7 +229,6 @@ public class NormalAvl<T extends Comparable<T>> {
      * 删除指定的叶子节点
      *
      * @param leafNode 被删除的叶子检点
-     * @return 被删除的叶子检点
      */
     private void removeLeafNode(Node<T> leafNode) {
         if (!leafNode.isLeaf()) {
@@ -283,12 +291,12 @@ public class NormalAvl<T extends Comparable<T>> {
             return null;
         }
         int cmp = value.compareTo(node.value);
-        if (cmp > 0) {
-            return find(node.right, value);
-        } else if (cmp < 0) {
-            return find(node.left, value);
-        } else {
+        if (cmp == 0) {
             return node;
+        } else if (cmp > 0) {
+            return find(node.right, value);
+        } else {
+            return find(node.left, value);
         }
     }
 
@@ -311,6 +319,11 @@ public class NormalAvl<T extends Comparable<T>> {
 
     private void put(Node<T> node, T value) {
         int compare = value.compareTo(node.value);
+        if (compare == 0) {
+            // compare == 0 表示已存在，更新value，不需要重新执行平衡操作
+            node.value = value;
+            return;
+        }
         if (compare > 0) {
             if (node.right != null) {
                 put(node.right, value);
@@ -318,16 +331,13 @@ public class NormalAvl<T extends Comparable<T>> {
                 node.right = new Node<>(node, value);
                 size++;
             }
-        } else if (compare < 0) {
+        } else {
             if (node.left != null) {
                 put(node.left, value);
             } else {
                 node.left = new Node<>(node, value);
                 size++;
             }
-        } else {
-            // compare == 0 表示已存在，更新value
-            node.value = value;
         }
         balancedAVL(node);
     }
@@ -352,10 +362,12 @@ public class NormalAvl<T extends Comparable<T>> {
         if (!balancedType.isBalanced()) {
             return false;
         }
-        if (node.left != null && !node.left.isLeaf() && !isBalanced(node.left)) {
+        boolean leftFlag = node.left != null && !node.left.isLeaf() && !isBalanced(node.left);
+        if (leftFlag) {
             return false;
         }
-        if (node.right != null && !node.right.isLeaf() && !isBalanced(node.right)) {
+        boolean rightFlag = node.right != null && !node.right.isLeaf() && !isBalanced(node.right);
+        if (rightFlag) {
             return false;
         }
         return true;
@@ -424,7 +436,7 @@ public class NormalAvl<T extends Comparable<T>> {
     }
 
     /**
-     * 平衡操作（新增平衡）
+     * 平衡操作（添加平衡）
      *
      * @param parent 新加入节点的父节点
      * @return 平衡后的子树根节点
@@ -753,7 +765,7 @@ public class NormalAvl<T extends Comparable<T>> {
             if (isLeaf()) {
                 return false;
             }
-            if (left != null && right != null) {
+            if (hasDoubleChild()) {
                 return false;
             }
             return true;

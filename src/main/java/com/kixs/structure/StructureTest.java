@@ -19,12 +19,12 @@ public class StructureTest {
 
     private static void normalAVLTest() {
         NormalAvl<Integer> avl = new NormalAvl<>();
-        String dataFileName = RandomIntGenerator.getDataFileName(50);
+        String dataFileName = RandomIntGenerator.getDataFileName(100);
         Integer[] data = RandomIntGenerator.getRandomIntFromFile(dataFileName);
         Stream.of(data).forEach(avl::put);
         // removeLeafTest(avl);
         // removeSingleLeaf(avl);
-        removeDoubleChild(avl);
+        // removeDoubleChild(avl);
         boolean isBalanced = avl.isBalanced();
         System.out.println(isBalanced ? "AVL is balanced!" : "AVL is not balanced!");
         System.out.println(avl.inorderTraversal().stream().map(String::valueOf).collect(Collectors.joining(",")));
