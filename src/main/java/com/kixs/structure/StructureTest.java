@@ -1,6 +1,7 @@
 package com.kixs.structure;
 
-import com.kixs.structure.avl.NormalAvl;
+import com.kixs.structure.tree.BinarySearchTree;
+import com.kixs.structure.tree.avl.NormalAvl;
 import com.kixs.util.RandomIntGenerator;
 
 import java.util.stream.Collectors;
@@ -15,13 +16,28 @@ public class StructureTest {
     public static void main(String[] args) {
         // binarySearchTreeTest();
         normalAVLTest();
+        //hashMapTest();
+    }
+
+    private static void hashMapTest() {
+        /*HashMap<RedBlackTree, Integer> map = new HashMap<>();
+        Stream.iterate(1, item -> item + 1)
+                .limit(1024)
+                .forEach(e -> {
+                    RedBlackTree key = new RedBlackTree(e);
+                    map.put(key, e);
+                });
+
+        RedBlackTree key = new RedBlackTree(10000);
+        map.put(key, key.getKey());
+        map.put(null, null);*/
     }
 
     private static void normalAVLTest() {
-        NormalAvl<Integer> avl = new NormalAvl<>();
+        NormalAvl<Integer, Integer> avl = new NormalAvl<>();
         String dataFileName = RandomIntGenerator.getDataFileName(100);
         Integer[] data = RandomIntGenerator.getRandomIntFromFile(dataFileName);
-        Stream.of(data).forEach(avl::put);
+        Stream.of(data).forEach(e -> avl.put(e, e));
         // removeLeafTest(avl);
         // removeSingleLeaf(avl);
         // removeDoubleChild(avl);
@@ -31,7 +47,7 @@ public class StructureTest {
         System.out.println(avl.preOrderTraversal().stream().map(String::valueOf).collect(Collectors.joining(",")));
     }
 
-    private static void removeDoubleChild(NormalAvl<Integer> avl) {
+    private static void removeDoubleChild(NormalAvl<Integer, Integer> avl) {
 //        avl.remove(1);
 //        avl.remove(5);
 //        avl.remove(8);
@@ -45,7 +61,7 @@ public class StructureTest {
 //        avl.remove(44);
     }
 
-    private static void removeSingleLeaf(NormalAvl<Integer> avl) {
+    private static void removeSingleLeaf(NormalAvl<Integer, Integer> avl) {
 //        avl.remove(2);
 //        avl.remove(7);
 //        avl.remove(16);
@@ -55,7 +71,7 @@ public class StructureTest {
         avl.remove(38);
     }
 
-    private static void removeLeafTest(NormalAvl<Integer> avl) {
+    private static void removeLeafTest(NormalAvl<Integer, Integer> avl) {
 //        avl.remove(0);
 //        avl.remove(3);
 //        avl.remove(6);

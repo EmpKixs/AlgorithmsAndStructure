@@ -1,4 +1,4 @@
-package com.kixs.structure;
+package com.kixs.structure.tree;
 
 import com.google.common.collect.Lists;
 

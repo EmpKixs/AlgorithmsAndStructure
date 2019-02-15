@@ -1,4 +1,4 @@
-package com.kixs.structure.avl;
+package com.kixs.structure.tree.avl;
 
 /**
  * AVL平衡类型
