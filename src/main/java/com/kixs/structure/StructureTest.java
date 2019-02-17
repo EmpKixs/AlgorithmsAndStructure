@@ -16,26 +16,11 @@ public class StructureTest {
     public static void main(String[] args) {
         // binarySearchTreeTest();
         normalAVLTest();
-        //hashMapTest();
-    }
-
-    private static void hashMapTest() {
-        /*HashMap<RedBlackTree, Integer> map = new HashMap<>();
-        Stream.iterate(1, item -> item + 1)
-                .limit(1024)
-                .forEach(e -> {
-                    RedBlackTree key = new RedBlackTree(e);
-                    map.put(key, e);
-                });
-
-        RedBlackTree key = new RedBlackTree(10000);
-        map.put(key, key.getKey());
-        map.put(null, null);*/
     }
 
     private static void normalAVLTest() {
         NormalAvl<Integer, Integer> avl = new NormalAvl<>();
-        String dataFileName = RandomIntGenerator.getDataFileName(100);
+        String dataFileName = RandomIntGenerator.getDataFileName(10000);
         Integer[] data = RandomIntGenerator.getRandomIntFromFile(dataFileName);
         Stream.of(data).forEach(e -> avl.put(e, e));
         // removeLeafTest(avl);

@@ -1,5 +1,7 @@
 package com.kixs.structure.tree.avl;
 
+import com.kixs.structure.tree.AbstractTreeRoot;
+import com.kixs.structure.tree.Tree;
 import com.kixs.structure.tree.TreeNode;
 
 import java.util.List;
@@ -11,7 +13,7 @@ import java.util.List;
  * @author wangbing
  * @version 1.0, 2018/11/9
  */
-public class NormalAvl<K extends Comparable<K>, V> {
+public class NormalAvl<K extends Comparable<K>, V> implements AbstractTreeRoot<K, V> {
 
     /**
      * 根节点
@@ -22,6 +24,24 @@ public class NormalAvl<K extends Comparable<K>, V> {
      * 节点数
      */
     private int size = 0;
+
+    @Override
+    public TreeNode<K, V> getRoot() {
+        return root;
+    }
+
+    @Override
+    public void changeRoot(Tree<K, V> root) {
+        if (root == null) {
+            this.root = null;
+            return;
+        }
+        if (root instanceof TreeNode) {
+            this.root = (TreeNode<K, V>) root;
+            return;
+        }
+        throw new IllegalArgumentException("根节点修改失败：illegal root " + root.getClass());
+    }
 
     /**
      * 获取二叉平衡树大小（节点数）
@@ -418,13 +438,13 @@ public class NormalAvl<K extends Comparable<K>, V> {
                 if (balancedNode.getParent().getRight() == null) {
                     balancedNode = simpleRightRotation(balancedNode);
                 } else {
-                    balancedNode = (TreeNode<K, V>) balancedNode.rightRotation(root);
+                    balancedNode = (TreeNode<K, V>) balancedNode.rightRotation(this);
                 }
             } else {
                 if (balancedNode.getParent().getLeft() == null) {
                     balancedNode = simpleLeftRotation(balancedNode);
                 } else {
-                    balancedNode = (TreeNode<K, V>) balancedNode.leftRotation(root);
+                    balancedNode = (TreeNode<K, V>) balancedNode.leftRotation(this);
                 }
             }
         } else {
@@ -479,39 +499,39 @@ public class NormalAvl<K extends Comparable<K>, V> {
 
     private TreeNode<K, V> simpleLeftRotation(TreeNode<K, V> balancedNode) {
         if (balancedNode.getLeft() == null) {
-            return (TreeNode<K, V>) balancedNode.leftRotation(root);
+            return (TreeNode<K, V>) balancedNode.leftRotation(this);
         } else {
             // TODO 待优化
             TreeNode<K, V> childRoot = rebuildRL(balancedNode);
-            return (TreeNode<K, V>) childRoot.leftRotation(root);
+            return (TreeNode<K, V>) childRoot.leftRotation(this);
         }
     }
 
     private TreeNode<K, V> simpleRightRotation(TreeNode<K, V> balancedNode) {
         if (balancedNode.getRight() == null) {
-            return (TreeNode<K, V>) balancedNode.rightRotation(root);
+            return (TreeNode<K, V>) balancedNode.rightRotation(this);
         } else {
             // TODO 待优化
             TreeNode<K, V> childRoot = rebuildLR(balancedNode);
-            return (TreeNode<K, V>) childRoot.rightRotation(root);
+            return (TreeNode<K, V>) childRoot.rightRotation(this);
         }
     }
 
     private TreeNode<K, V> fixLeftRotation(TreeNode<K, V> balancedNode) {
         if (balancedNode.equals(balancedNode.getParent().getRight())) {
-            return (TreeNode<K, V>) balancedNode.getParent().leftRotation(root);
+            return (TreeNode<K, V>) balancedNode.getParent().leftRotation(this);
         } else {
-            TreeNode<K, V> childRoot = (TreeNode<K, V>) balancedNode.rightRotation(root);
-            return (TreeNode<K, V>) childRoot.leftRotation(root);
+            TreeNode<K, V> childRoot = (TreeNode<K, V>) balancedNode.rightRotation(this);
+            return (TreeNode<K, V>) childRoot.leftRotation(this);
         }
     }
 
     private TreeNode<K, V> fixRightRotation(TreeNode<K, V> balancedNode) {
         if (balancedNode.equals(balancedNode.getParent().getLeft())) {
-            return (TreeNode<K, V>) balancedNode.getParent().rightRotation(root);
+            return (TreeNode<K, V>) balancedNode.getParent().rightRotation(this);
         } else {
-            TreeNode<K, V> childRoot = (TreeNode<K, V>) balancedNode.leftRotation(root);
-            return (TreeNode<K, V>) childRoot.rightRotation(root);
+            TreeNode<K, V> childRoot = (TreeNode<K, V>) balancedNode.leftRotation(this);
+            return (TreeNode<K, V>) childRoot.rightRotation(this);
         }
     }
 

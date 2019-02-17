@@ -1,5 +1,8 @@
 package com.kixs.structure.tree.avl.rb;
 
+import com.kixs.structure.tree.AbstractTreeRoot;
+import com.kixs.structure.tree.Tree;
+
 /**
  * 红黑树
  * 性质：
@@ -17,11 +20,29 @@ package com.kixs.structure.tree.avl.rb;
  * @date 2019/2/15 10:48
  * Copyright: Copyright (c) 2019
  */
-public class RedBlackTree<K extends Comparable<K>, V> {
+public class RedBlackTree<K extends Comparable<K>, V> implements AbstractTreeRoot<K, V> {
 
     private RbTreeNode<K, V> root;
 
     private int size = 0;
+
+    @Override
+    public Tree<K, V> getRoot() {
+        return null;
+    }
+
+    @Override
+    public void changeRoot(Tree<K, V> root) {
+        if (root == null) {
+            this.root = null;
+            return;
+        }
+        if (root instanceof RbTreeNode) {
+            this.root = (RbTreeNode<K, V>) root;
+            return;
+        }
+        throw new IllegalArgumentException("根节点修改失败：illegal root " + root.getClass());
+    }
 
     /**
      * 节点数

@@ -226,7 +226,7 @@ public interface Tree<K extends Comparable<K>, V> {
      * @param root 根节点
      * @return 旋转后子树根节点
      */
-    default Tree<K, V> leftRotation(Tree<K, V> root) {
+    default Tree<K, V> leftRotation(AbstractTreeRoot<K, V> root) {
         // 1、定位父节点P和左子节点left，P = X.parent，left = X.left；定位P的父节点PP，PP = P.parent；
         Tree<K, V> p = this.getParent();
         // x不能为根节点且x为P的右子节点
@@ -256,7 +256,7 @@ public interface Tree<K extends Comparable<K>, V> {
             // 5.3、P为PP的右子节点，即P == PP.right，则PP.right = X；
             this.changeParent(pp);
             if (pp == null) {
-                root = this;
+                root.changeRoot(this);
             } else if (p.equals(pp.getLeft())) {
                 pp.changeLeft(this);
             } else {
@@ -272,7 +272,7 @@ public interface Tree<K extends Comparable<K>, V> {
      * @param root 根节点
      * @return 旋转后子树根节点
      */
-    default Tree<K, V> rightRotation(Tree<K, V> root) {
+    default Tree<K, V> rightRotation(AbstractTreeRoot<K, V> root) {
         // 1、定位父节点P和左子节点right，P = X.parent，right = X.right；定位P的父节点PP，PP = P.parent；
         Tree<K, V> p = this.getParent();
         // x不能为根节点且x为P的左子节点
@@ -302,7 +302,7 @@ public interface Tree<K extends Comparable<K>, V> {
             // 5.3、P为PP的右子节点，即P == PP.right，则PP.right = X；
             this.changeParent(pp);
             if (pp == null) {
-                root = this;
+                root.changeRoot(this);
             } else if (p.equals(pp.getLeft())) {
                 pp.changeLeft(this);
             } else {
