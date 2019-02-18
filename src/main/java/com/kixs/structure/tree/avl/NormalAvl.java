@@ -502,7 +502,8 @@ public class NormalAvl<K extends Comparable<K>, V> implements AbstractTreeRoot<K
             return (TreeNode<K, V>) balancedNode.leftRotation(this);
         } else {
             // TODO 待优化
-            TreeNode<K, V> childRoot = rebuildRL(balancedNode);
+            // TreeNode<K, V> childRoot = rebuildRL(balancedNode);
+            TreeNode<K, V> childRoot = (TreeNode<K, V>) balancedNode.getLeft().rightRotation(this);
             return (TreeNode<K, V>) childRoot.leftRotation(this);
         }
     }
@@ -512,7 +513,8 @@ public class NormalAvl<K extends Comparable<K>, V> implements AbstractTreeRoot<K
             return (TreeNode<K, V>) balancedNode.rightRotation(this);
         } else {
             // TODO 待优化
-            TreeNode<K, V> childRoot = rebuildLR(balancedNode);
+            // TreeNode<K, V> childRoot = rebuildLR(balancedNode);
+            TreeNode<K, V> childRoot = (TreeNode<K, V>) balancedNode.getRight().leftRotation(this);
             return (TreeNode<K, V>) childRoot.rightRotation(this);
         }
     }

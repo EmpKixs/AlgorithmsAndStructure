@@ -20,7 +20,7 @@ public class StructureTest {
 
     private static void normalAVLTest() {
         NormalAvl<Integer, Integer> avl = new NormalAvl<>();
-        String dataFileName = RandomIntGenerator.getDataFileName(10000);
+        String dataFileName = RandomIntGenerator.getDataFileName(50);
         Integer[] data = RandomIntGenerator.getRandomIntFromFile(dataFileName);
         Stream.of(data).forEach(e -> avl.put(e, e));
         // removeLeafTest(avl);

@@ -28,7 +28,7 @@ public class RedBlackTree<K extends Comparable<K>, V> implements AbstractTreeRoo
 
     @Override
     public Tree<K, V> getRoot() {
-        return null;
+        return root;
     }
 
     @Override
