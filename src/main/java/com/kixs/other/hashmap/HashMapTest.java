@@ -13,13 +13,18 @@ public class HashMapTest {
     public static void main(String[] args) {
 
         HashMap<DataKey, Integer> map = new HashMap<>(128);
-        for (int i = 0; i < 10; i++) {
-            if (i > 7) {
-                System.out.println(i);
+        for (int i = 0; i < 100; i++) {
+            if (i % 5 == 0) {
+                if (i > 30) {
+                    System.out.println(i);
+                }
+                map.put(new DataKey("0"), i);
+            } else {
+                map.put(new DataKey("" + i), i);
             }
-            map.put(new DataKey("0"), i);
         }
 
+        map.get("0");
         System.out.println(map.toString());
     }
 }
