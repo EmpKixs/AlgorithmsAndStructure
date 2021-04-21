@@ -9,7 +9,7 @@ package com.kixs.leetcode;
  *
  * @author wangbing
  * @version v1.0.0
- * @date 2019/9/26 10:25
+ * @date 2020-04-21 18:16
  */
 public class LeetCode_00287_FindTheDuplicateNumber {
 
