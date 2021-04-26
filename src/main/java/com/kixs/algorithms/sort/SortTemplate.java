@@ -1,6 +1,6 @@
 package com.kixs.algorithms.sort;
 
-import com.kixs.constants.GloableConstant;
+import com.kixs.constants.GlobalConstant;
 
 /**
  * 排序模板接口
@@ -18,6 +18,6 @@ public interface SortTemplate {
     void sort(Comparable[] data);
 
     default String resultPath() {
-        return GloableConstant.RESULT_PATH + sortType() + GloableConstant.PATH_SEPARATOR;
+        return GlobalConstant.RESULT_PATH + sortType() + GlobalConstant.PATH_SEPARATOR;
     }
 }

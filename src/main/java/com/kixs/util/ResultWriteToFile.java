@@ -1,6 +1,6 @@
 package com.kixs.util;
 
-import com.kixs.constants.GloableConstant;
+import com.kixs.constants.GlobalConstant;
 
 import java.io.*;
 
@@ -17,8 +17,8 @@ public class ResultWriteToFile {
     }
 
     public static void initPath() {
-        mkdir(GloableConstant.WHOLE_RESULT_PATH);
-        mkdir(GloableConstant.WHOLE_DATA_PATH);
+        mkdir(GlobalConstant.WHOLE_RESULT_PATH);
+        mkdir(GlobalConstant.WHOLE_DATA_PATH);
     }
 
     public static void writeToFile(Integer[] data, String fileName) {
@@ -28,8 +28,8 @@ public class ResultWriteToFile {
             try {
                 printStream = new PrintStream(new FileOutputStream(file));
             } catch (FileNotFoundException e) {
-                String wholeFilePath = GloableConstant.PROJECT_DIRECTORY + GloableConstant.PATH_SEPARATOR + fileName;
-                mkdir(wholeFilePath.substring(0, wholeFilePath.lastIndexOf(GloableConstant.PATH_SEPARATOR)));
+                String wholeFilePath = GlobalConstant.PROJECT_DIRECTORY + GlobalConstant.PATH_SEPARATOR + fileName;
+                mkdir(wholeFilePath.substring(0, wholeFilePath.lastIndexOf(GlobalConstant.PATH_SEPARATOR)));
                 printStream = new PrintStream(new FileOutputStream(file));
             }
             int N = data.length;
@@ -53,7 +53,7 @@ public class ResultWriteToFile {
         if (!existed) {
             existed = dir.mkdir();
             if (!existed) {
-                boolean parentExisted = mkdir(path.substring(0, path.lastIndexOf(GloableConstant.PATH_SEPARATOR)));
+                boolean parentExisted = mkdir(path.substring(0, path.lastIndexOf(GlobalConstant.PATH_SEPARATOR)));
                 if (parentExisted) {
                     existed = dir.mkdir();
                 }

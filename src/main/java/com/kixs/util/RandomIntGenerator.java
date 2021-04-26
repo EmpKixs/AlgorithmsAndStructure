@@ -1,6 +1,6 @@
 package com.kixs.util;
 
-import com.kixs.constants.GloableConstant;
+import com.kixs.constants.GlobalConstant;
 
 import java.io.IOException;
 import java.util.Random;
@@ -27,7 +27,7 @@ public class RandomIntGenerator {
     }
 
     public static void generatorRandomInt(int N) throws IOException {
-        String fileName = GloableConstant.WHOLE_DATA_PATH + "int-" + N + ".txt";
+        String fileName = GlobalConstant.WHOLE_DATA_PATH + "int-" + N + ".txt";
         Integer[] data = new Integer[N];
         Random random = new Random(N);
         for (int i = 0; i < N; i++) {
@@ -45,7 +45,7 @@ public class RandomIntGenerator {
     }
 
     public static String getDataFileName(int limit) {
-        return GloableConstant.DATA_PATH + buildDataFileName(limit);
+        return GlobalConstant.DATA_PATH + buildDataFileName(limit);
     }
 
     private static String buildDataFileName(int limit) {

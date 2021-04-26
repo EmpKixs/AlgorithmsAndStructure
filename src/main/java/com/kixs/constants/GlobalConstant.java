@@ -6,7 +6,7 @@ package com.kixs.constants;
  * @author wangbing
  * @version 1.0, 2018/11/9
  */
-public class GloableConstant {
+public class GlobalConstant {
 
     public static final String PROJECT_DIRECTORY = System.getProperty("user.dir");
 
