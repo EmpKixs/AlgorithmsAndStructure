@@ -1,5 +1,7 @@
 package com.kixs.leetcode;
 
+import java.util.Arrays;
+
 /**
  * url:https://leetcode-cn.com/problems/cinema-seat-allocation/
  * <p>
@@ -15,6 +17,21 @@ package com.kixs.leetcode;
 public class LeetCode_01386_CinemaSeatAllocation {
 
     public int maxNumberOfFamilies(int n, int[][] reservedSeats) {
+        Arrays.sort(reservedSeats, (a, b) -> {
+            if (a[0] < b[0]) {
+                return -1;
+            } else  if (a[0] > b[0]){
+                return 1;
+            } else {
+                if (a[1] < b[1]) {
+                    return -1;
+                } else if (a[1] > b[1]){
+                    return 1;
+                }
+            }
+            return 0;
+        });
+
         int[][] seats = new int[n][10];
         // 标记座位已选中
         for (int[] reservedSeat : reservedSeats) {
@@ -25,15 +42,25 @@ public class LeetCode_01386_CinemaSeatAllocation {
         // 每行可选的组合一共有三种：1,2,3,4; 3,4,5,6; 5,6,7,8
         for (int rowNum = 0; rowNum < n; rowNum++) {
             int[] row = seats[rowNum];
-            if (row[3] == 0 && row[4] == 0) {
-                if (row[1] == 0 && row[2] == 0) {
-                    families++;
-                }
-                if (row[5] == 0 && row[6] == 0) {
-                    families++;
-                }
+            if (row[3] == 0 && row[4] == 0 && row[1] == 0 && row[2] == 0) {
+                row[3] = 1;
+                row[4] = 1;
+                row[1] = 1;
+                row[2] = 1;
+                families++;
+            }
+            if (row[3] == 0 && row[4] == 0 && row[5] == 0 && row[6] == 0) {
+                row[3] = 1;
+                row[4] = 1;
+                row[5] = 1;
+                row[6] = 1;
+                families++;
             }
             if (row[5] == 0 && row[6] == 0 && row[7] == 0 && row[8] == 0) {
+                row[5] = 1;
+                row[6] = 1;
+                row[7] = 1;
+                row[8] = 1;
                 families++;
             }
         }
