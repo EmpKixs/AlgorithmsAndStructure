@@ -4,29 +4,28 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
- * 从文件读取结果集
+ * 文件工具类
  *
  * @author wangbing
- * @version 1.0, 2018/11/9
+ * @version v1.0.0
+ * @since 2021/4/27 10:03
  */
-public class ResultReadFormFile {
+public class FileUtils {
 
-    public static Integer[] readFromFile(String filePath) {
+    public static String read(String filePath) {
         File file = new File(filePath);
         if (!file.exists()) {
-            return new Integer[]{};
+            throw new RuntimeException("File Not Found：" + filePath);
         }
-        List<Integer> data = new ArrayList<>();
         BufferedReader reader = null;
+        StringBuilder builder = new StringBuilder();
         try {
             reader = new BufferedReader(new FileReader(file));
             String temp;
             while ((temp = reader.readLine()) != null) {
-                data.add(Integer.valueOf(temp));
+                builder.append(temp);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -40,6 +39,6 @@ public class ResultReadFormFile {
             }
         }
 
-        return data.toArray(new Integer[data.size()]);
+        return builder.toString();
     }
 }

@@ -15,4 +15,8 @@ public class Stopwatch {
     public double elapsedTime() {
         return (System.currentTimeMillis() - start) / 1000.0;
     }
+
+    public long elapsedMillis() {
+        return System.currentTimeMillis() - start;
+    }
 }

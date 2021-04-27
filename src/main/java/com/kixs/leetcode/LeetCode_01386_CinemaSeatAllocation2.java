@@ -19,47 +19,59 @@ import java.util.Comparator;
  * @version v1.0.0
  * @since 2021/4/26 18:03
  */
-public class LeetCode_01386_CinemaSeatAllocation {
+public class LeetCode_01386_CinemaSeatAllocation2 {
 
     public int maxNumberOfFamilies(int n, int[][] reservedSeats) {
         Arrays.sort(reservedSeats, Comparator.comparingInt(x -> x[0]));
         int families = 0;
         int reservedRowNum = 0;
+        int left = 0b11110000;
+        int middle = 0b00111100;
+        int right = 0b00001111;
         for (int i = 0; i < reservedSeats.length; ) {
             // 每行可选的组合一共有三种：2,3,4,5; 4,5,6,7; 6,7,8,9
             // 每行可选的组合一共有三种：1,2,3,4; 3,4,5,6; 5,6,7,8
             reservedRowNum++;
             int rowNum = reservedSeats[i][0];
-            boolean flag23 = false, flag45 = false, flag67 = false, flag89 = false;
+            int row = 0b00000000;
             do {
                 switch (reservedSeats[i][1]) {
                     case 2:
+                        row += 0b10000000;
+                        break;
                     case 3:
-                        flag23 = true;
+                        row += 0b01000000;
                         break;
                     case 4:
+                        row += 0b00100000;
+                        break;
                     case 5:
-                        flag45 = true;
+                        row += 0b00010000;
                         break;
                     case 6:
+                        row += 0b00001000;
+                        break;
                     case 7:
-                        flag67 = true;
+                        row += 0b00000100;
                         break;
                     case 8:
+                        row += 0b00000010;
+                        break;
                     case 9:
-                        flag89 = true;
+                        row += 0b00000001;
+                        break;
                     default:
                 }
             } while (++i < reservedSeats.length && rowNum == reservedSeats[i][0]);
-            if (!flag23 && !flag45) {
+            boolean flagL = (left ^ row & left) == left;
+            if (flagL) {
                 families++;
-                flag45 = true;
             }
-            if (!flag45 && !flag67) {
+            boolean flagM = !flagL && (middle ^ row & middle) == middle;
+            if (flagM) {
                 families++;
-                flag67 = true;
             }
-            if (!flag67 && !flag89) {
+            if (!flagM && (right ^ row & right) == right) {
                 families++;
             }
         }
@@ -76,7 +88,7 @@ public class LeetCode_01386_CinemaSeatAllocation {
         int[][] reservedSeats = {{1, 2}, {1, 3}, {1, 8}, {2, 6}, {3, 1}, {3, 10}};
         int n = 3;
         Stopwatch stopwatch = new Stopwatch();
-        System.out.println(new LeetCode_01386_CinemaSeatAllocation().maxNumberOfFamilies(n, reservedSeats));
+        System.out.println(new LeetCode_01386_CinemaSeatAllocation2().maxNumberOfFamilies(n, reservedSeats));
         System.out.println(stopwatch.elapsedMillis());
     }
 
@@ -99,7 +111,7 @@ public class LeetCode_01386_CinemaSeatAllocation {
         }
         int n = 1000000000;
         Stopwatch stopwatch = new Stopwatch();
-        System.out.println(new LeetCode_01386_CinemaSeatAllocation().maxNumberOfFamilies(n, reservedSeats));
+        System.out.println(new LeetCode_01386_CinemaSeatAllocation2().maxNumberOfFamilies(n, reservedSeats));
         System.out.println(stopwatch.elapsedMillis());
     }
 }
