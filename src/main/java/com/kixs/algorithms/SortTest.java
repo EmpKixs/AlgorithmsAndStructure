@@ -18,9 +18,8 @@ public class SortTest {
 
     public static void main(String[] args) {
         showResultTitle();
-        //int[] dataLimit = new int[]{10, 100, 1000, 10000, 100000};
+        int[] dataLimit = new int[]{10, 100, 1000, 10000, 100000};
         //int[] dataLimit = new int[]{10, 100, 1000, 10000, 100000, 1000000};
-        int[] dataLimit = new int[]{10};
         // 选择排序
         sortTest(dataLimit, new SortSelection());
         // 插入排序
