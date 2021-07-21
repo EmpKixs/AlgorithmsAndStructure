@@ -1,7 +1,6 @@
 package com.kixs.other;
 
 import com.google.common.collect.Sets;
-import com.kixs.other.test1.Child;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -16,7 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class OtherTest {
 
     public static void main(String[] args) {
-        intBoxingTest();
+        /*intBoxingTest();
         intBoundTest();
         floatCompareTest();
         Child child = new Child();
@@ -24,7 +23,15 @@ public class OtherTest {
         stringCompareTest();
         hashMapTest();
         setTest();
-        concurrentHashMapTest();
+        concurrentHashMapTest();*/
+        bitTest();
+    }
+
+    public static void bitTest() {
+        // 1-2-8-2-8-7-4
+        // 0-11-00000001-00-00000000-0000000-0000
+        int b = 0b01100001101000000010100000000000;
+        System.out.println(b);
     }
 
     public static void intBoxingTest() {
