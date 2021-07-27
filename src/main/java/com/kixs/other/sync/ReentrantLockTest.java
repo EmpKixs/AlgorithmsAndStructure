@@ -31,8 +31,8 @@ public class ReentrantLockTest {
     public static void main(String[] args) {
         int limit = 10;
         for (int i = 0; i < limit; i++) {
-            // 无锁操作自增结果 <--> 加锁操作自增结果
-            System.out.println(incrTest(300).getSeed() + " <---> " + incrLockTest(300).getSeed());
+            // 无锁操作自增结果 <--> 加锁lock操作自增结果 <--> 加锁tryLock操作自增结果
+            System.out.println(incrTest(300).getSeed() + " <---> " + incrLockTest(300).getSeed() + " <---> " + incrTryLockTest(300).getSeed());
         }
         POOL.shutdown();
         POOL = null;
@@ -69,7 +69,23 @@ public class ReentrantLockTest {
         }
         CompletableFuture<Void> allOf = CompletableFuture.allOf(futures.toArray(new CompletableFuture[]{}));
         allOf.join();
+        return seed;
+    }
 
+    /**
+     * 加锁自增操作
+     *
+     * @param limit 循环自增次数
+     * @return 自增结果
+     */
+    public static Seed incrTryLockTest(int limit) {
+        Seed seed = new Seed(1);
+        List<CompletableFuture<Void>> futures = Lists.newArrayList();
+        for (int i = 0; i < limit; i++) {
+            futures.add(CompletableFuture.runAsync(seed::incrTryLockTen, POOL));
+        }
+        CompletableFuture<Void> allOf = CompletableFuture.allOf(futures.toArray(new CompletableFuture[]{}));
+        allOf.join();
         return seed;
     }
 
@@ -91,14 +107,23 @@ public class ReentrantLockTest {
         void incrLockTen() {
             lock.lock();
             try {
-                while (!lock.isLocked()) {
-                    lock.lock();
-                }
-                for (int i = 0; i < TEN; i++) {
-                    seed++;
-                }
+                incrTen();
             } finally {
-                if (lock.isLocked()) {
+                lock.unlock();
+            }
+        }
+
+        void incrTryLockTen() {
+            boolean locked = false;
+            try {
+                locked = lock.tryLock(10, TimeUnit.SECONDS);
+                if (locked) {
+                    incrTen();
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } finally {
+                if (locked) {
                     lock.unlock();
                 }
             }
